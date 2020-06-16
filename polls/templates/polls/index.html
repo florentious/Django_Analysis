@@ -1,0 +1,221 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/data.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+
+    <title>Trend Keyword Analysis</title>
+
+    <style>
+        textarea{
+            width:100%;
+            box-sizing: border-box;
+        }
+        #container {
+            height: 400px;
+        }
+
+        .highcharts-figure, .highcharts-data-table table {
+            min-width: 310px;
+            max-width: 800px;
+            margin: 1em auto;
+        }
+
+        #datatable {
+            font-family: Verdana, sans-serif;
+            border-collapse: collapse;
+            border: 1px solid #EBEBEB;
+            margin: 10px auto;
+            text-align: center;
+            width: 100%;
+            max-width: 500px;
+        }
+        #datatable caption {
+            padding: 1em 0;
+            font-size: 1.2em;
+            color: #555;
+        }
+        #datatable th {
+            font-weight: 600;
+            padding: 0.5em;
+        }
+        #datatable td, #datatable th, #datatable caption {
+            padding: 0.5em;
+        }
+        #datatable thead tr, #datatable tr:nth-child(even) {
+            background: #f8f8f8;
+        }
+        #datatable tr:hover {
+            background: #f1f7ff;
+        }
+
+        img {
+            max-width : 100%;
+            height: auto !important;
+        }
+
+    </style>
+
+</head>
+<body>
+    <br>
+    <div class="col-sm-12">
+        <h1>키워드 분석</h1>
+        <br><br>
+        <h3>입력</h3>
+        <div class="col-sm-12 row">
+            <div class="col-sm-3">
+                <label for="context"> 입력</label>
+                <br>
+                <button class="btn btn-secondary" id="useText"> 직접</button>
+                <br>
+                <button class="btn btn-secondary" id="useFile"> 파일</button>
+            </div>
+            <div class="col-sm-9" id="div_useText">
+
+                <textarea id="context" rows="5" style="resize:none;" placeholder="여기에 넣어주세요"></textarea>
+                <button type="button" class="btn btn-secondary" id="analysis">Analysis</button>
+                <input type="hidden" id="checkAnalysis" value="on">
+            </div>
+
+            <div class="col-sm-9" id="div_useFile" style="display:none">
+                <div class="input-group">
+                    <div class="custom-file">
+                        <form id="fileUploadForm" enctype="multipart/form-data">
+                            <input type="file" class="custom-file-input" id="inputFile" multiple aria-describedby="inputGroupFileAddon04" accept="text/plain,.txt">
+                            <label class="custom-file-label" for="inputFile" id="inputFileLabel">Choose file</label>
+                        </form>
+                    </div>
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" type="button" id="inputFileAnalysis">Analysis</button>
+                    </div>
+                </div>
+                <input type="hidden" id="checkFile" value="on"/>
+                <div id="fileInputMsg">
+
+                </div>
+            </div>
+
+        </div>
+
+        <br>
+        <div class="col-sm-12 row" >
+            <div class="col-sm-3">
+                <label for="div_stopWord"> 불용어</label>
+            </div>
+            <div class="col-sm-7" id="div_stopWord">
+                <input type="text" style="width:100%;" placeholder="불용어입력"/>
+            </div>
+            <div class="col-sm-2">
+                <button class="btn btn-secondary" id="addStopWord" name="addStopWord">추가</button>
+                <button class="btn btn-secondary" id="delStopWord" name="delStopWord">제거</button>
+                <!--
+                <button class="btn btn-secondary" id="saveStopWord" name="saveStopWord">저장</button>
+                <button class="btn btn-secondary" id="loadStopWord" name="loadStopWord">로드</button>
+                -->
+            </div>
+
+
+        </div>
+
+        <br>
+        <div class="col-sm-12 row" >
+            <div class="col-sm-3">
+                <label for="countKeyWord"> 키워드 수(1-40)</label>
+            </div>
+            <div class="col-sm-9" >
+                <input type="number" name="countKeyWord" id="countKeyWord" style="width:100%;" min="1" max="40" value="10" />
+            </div>
+
+
+        </div>
+        <!--
+        <br>
+        <div class="btn-group btn-group-toggle" data-toggle="buttons">
+            <label class="btn btn-secondary active">
+                <input type="radio" name="useModelType" id="wordCount" checked>Word Count
+            </label>
+            <label class="btn btn-secondary">
+                <input type="radio" name="useModelType" id="textRank"> Text Rank
+            </label>
+        </div>
+        -->
+
+    </div>
+    <!-- results -->
+    <div class="col-sm-12" id="output" style="display:none;">
+        <br><br>
+        <h3>연산결과</h3>
+        <div class="col-sm-12 row">
+            <div class="col-sm-3">
+                <label for="output"> 키워드<br>(나온 카운트 수) </label>
+            </div>
+            <div class="col-sm-9" id="outputKeyword">
+
+            </div>
+            <div class="col-sm-3"></div>
+            <div class="col-sm-9">
+                <button class="btn btn-secondary" id="viewChart">Chart</button>
+                <button class="btn btn-secondary" id="viewCloud">Cloud</button>
+            </div>
+        </div>
+
+    </div>
+
+    <br>
+    <!-- chart -->
+    <div class="col-sm-12" id="div_chart" style="display:none">
+
+        <figure class="highcharts-figure">
+            <div id="container"></div>
+
+            <table id="datatable" style="display:none">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>키워드</th>
+                    </tr>
+                </thead>
+                <tbody id="datatable_body">
+
+                </tbody>
+            </table>
+        </figure>
+
+    </div>
+
+
+    <br>
+    <!-- word cloud -->
+    <div class="col-sm-12" id="div_cloud" style="display:none">
+
+        <div class="col-sm-12" id="img_cloud">
+
+        </div>
+    </div>
+
+
+    <br><br>
+
+
+
+
+
+    <!-- bootstrap js start -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+    <!-- bootstrap js end   -->
+    <!-- personal js        -->
+    {% load static %}
+    <script src="{% static 'js/jquery-3.5.1.js' %}" ></script>
+    <script src="{% static 'js/personal.js' %}"></script>
+
+</body>
+</html>

@@ -1,0 +1,8 @@
+{
+  "stop_word"       : "analysis/utils/stop_word.txt",
+  "max_count"       : 10,
+  "background_color": "white",
+  "font_path"       : "analysis/data/fonts/NanumGothicCoding.ttf",
+  "txt_dir_path"    : "polls/static/txt/"
+
+}
